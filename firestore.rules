@@ -1,0 +1,110 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: ingredients
+// Fields:
+//   - name: string (required)
+//   - currentQuantity: number (required)
+//   - unit: string (required, enum: kg, g, l, ml, un)
+//   - price: number (required)
+//   - purchaseUnit: string (required, enum: kg, g, l, ml, un)
+//   - threshold: number (required)
+//   - userId: string (required, immutable)
+//
+// Collection: recipes
+// Fields:
+//   - name: string (required)
+//   - yield: number (required)
+//   - ingredients: array of objects {ingredientId, amount} (required)
+//   - userId: string (required, immutable)
+//
+// Collection: logs
+// Fields:
+//   - userId: string (required, immutable)
+//   - date: timestamp (required)
+//   - type: string (required, enum: purchase, consumption, adjustment)
+//   - recipeId: string (optional)
+//   - recipeName: string (optional)
+//   - unitsProduced: number (optional)
+//   - note: string (optional)
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function userIdUnchanged() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid;
+    }
+
+    function userIdNotModified() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId;
+    }
+
+    function isValidIngredient(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.currentQuantity is number &&
+             data.unit in ['kg', 'g', 'l', 'ml', 'un'] &&
+             data.price is number && data.price >= 0 &&
+             data.purchaseUnit in ['kg', 'g', 'l', 'ml', 'un'] &&
+             data.threshold is number && data.threshold >= 0 &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidRecipe(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.yield is number && data.yield > 0 &&
+             data.ingredients is list &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidLog(data) {
+      return data.userId == request.auth.uid &&
+             data.date is timestamp &&
+             data.type in ['purchase', 'consumption', 'adjustment'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /ingredients/{ingredientId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidIngredient(request.resource.data);
+      allow update: if isDocOwner() && isValidIngredient(request.resource.data) && userIdNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /recipes/{recipeId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidRecipe(request.resource.data);
+      allow update: if isDocOwner() && isValidRecipe(request.resource.data) && userIdNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    match /logs/{logId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidLog(request.resource.data);
+      allow update: if false; // Logs are immutable
+      allow delete: if isDocOwner();
+    }
+  }
+}

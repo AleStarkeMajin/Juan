@@ -1,0 +1,69 @@
+{
+  "entities": {
+    "Ingredient": {
+      "title": "Ingredient",
+      "description": "An ingredient in the inventory",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the ingredient" },
+        "currentQuantity": { "type": "number", "description": "Current stock amount" },
+        "unit": { "type": "string", "enum": ["kg", "g", "l", "ml", "un"], "description": "Base unit of measurement" },
+        "price": { "type": "number", "description": "Price per purchase unit" },
+        "purchaseUnit": { "type": "string", "enum": ["kg", "g", "l", "ml", "un"], "description": "Unit used for purchasing" },
+        "threshold": { "type": "number", "description": "Minimum stock before alert" },
+        "userId": { "type": "string", "description": "Owner of the ingredient" }
+      },
+      "required": ["name", "currentQuantity", "unit", "price", "purchaseUnit", "threshold", "userId"]
+    },
+    "Recipe": {
+      "title": "Recipe",
+      "description": "A recipe that uses ingredients",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the recipe" },
+        "yield": { "type": "number", "description": "Number of units produced" },
+        "ingredients": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ingredientId": { "type": "string" },
+              "amount": { "type": "number" }
+            }
+          }
+        },
+        "userId": { "type": "string", "description": "Owner of the recipe" }
+      },
+      "required": ["name", "yield", "ingredients", "userId"]
+    },
+    "Log": {
+      "title": "Log",
+      "description": "A log of inventory changes",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "type": { "type": "string", "enum": ["purchase", "consumption", "adjustment"] },
+        "recipeId": { "type": "string" },
+        "recipeName": { "type": "string" },
+        "unitsProduced": { "type": "number" },
+        "note": { "type": "string" }
+      },
+      "required": ["userId", "date", "type"]
+    }
+  },
+  "firestore": {
+    "/ingredients/{ingredientId}": {
+      "schema": "Ingredient",
+      "description": "Collection of ingredients"
+    },
+    "/recipes/{recipeId}": {
+      "schema": "Recipe",
+      "description": "Collection of recipes"
+    },
+    "/logs/{logId}": {
+      "schema": "Log",
+      "description": "Collection of activity logs"
+    }
+  }
+}
