@@ -27,16 +27,19 @@ interface RecipeIngredientWithKey extends RecipeIngredient {
 
 export function RecipeDialog({ open, onOpenChange, recipe, ingredients, onSave }: RecipeDialogProps) {
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [yieldAmount, setYieldAmount] = useState(1);
   const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredientWithKey[]>([]);
 
   useEffect(() => {
     if (recipe) {
       setName(recipe.name);
+      setDescription(recipe.description || '');
       setYieldAmount(recipe.yield);
       setRecipeIngredients(recipe.ingredients.map(ri => ({ ...ri, key: Math.random().toString(36).substr(2, 9) })));
     } else {
       setName('');
+      setDescription('');
       setYieldAmount(1);
       setRecipeIngredients([]);
     }
@@ -51,7 +54,7 @@ export function RecipeDialog({ open, onOpenChange, recipe, ingredients, onSave }
   };
 
   const updateIngredient = (key: string, field: keyof RecipeIngredient, value: string | number) => {
-    setRecipeIngredients(prev => prev.map(ri => 
+    setRecipeIngredients(prev => prev.map(ri =>
       ri.key === key ? { ...ri, [field]: value } : ri
     ));
   };
@@ -60,6 +63,7 @@ export function RecipeDialog({ open, onOpenChange, recipe, ingredients, onSave }
     e.preventDefault();
     onSave({
       name,
+      description,
       yield: yieldAmount,
       ingredients: recipeIngredients
         .filter(ri => ri.ingredientId && ri.amount > 0)
@@ -98,6 +102,17 @@ export function RecipeDialog({ open, onOpenChange, recipe, ingredients, onSave }
                   required
                 />
               </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="recipe-description">Descripción / Procedimiento</Label>
+              <textarea
+                id="recipe-description"
+                className="flex min-h-[80px] w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Anota aquí los pasos o detalles de la receta..."
+              />
             </div>
 
             <div className="space-y-4">

@@ -24,6 +24,7 @@ export interface RecipeIngredient {
 export interface Recipe {
   id: string;
   name: string;
+  description?: string;
   ingredients: RecipeIngredient[];
   yield: number; // How many units/portions this recipe produces
 }
