@@ -13,14 +13,14 @@ import { toast } from 'sonner';
 
 import { auth, signIn, signOut } from './lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { 
-  subscribeToIngredients, 
-  subscribeToRecipes, 
-  saveIngredient, 
-  deleteIngredient, 
-  saveRecipe, 
-  deleteRecipe, 
-  cookRecipe 
+import {
+  subscribeToIngredients,
+  subscribeToRecipes,
+  saveIngredient,
+  deleteIngredient,
+  saveRecipe,
+  deleteRecipe,
+  cookRecipe
 } from './services/dataService';
 
 import { Ingredient, Recipe } from './types';
@@ -35,17 +35,17 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('inventory');
-  
+
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
 
   // Dialog states
   const [isIngredientDialogOpen, setIsIngredientDialogOpen] = useState(false);
   const [editingIngredient, setEditingIngredient] = useState<Ingredient | null>(null);
-  
+
   const [isRecipeDialogOpen, setIsRecipeDialogOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
-  
+
   const [isCookDialogOpen, setIsCookDialogOpen] = useState(false);
   const [cookingRecipe, setCookingRecipe] = useState<Recipe | null>(null);
 
@@ -154,8 +154,8 @@ export default function App() {
             </div>
           </CardHeader>
           <CardContent>
-            <Button 
-              onClick={signIn} 
+            <Button
+              onClick={signIn}
               className="w-full py-6 bg-zinc-900 text-white hover:bg-zinc-800 flex items-center justify-center gap-3 text-lg font-semibold"
             >
               <LogIn className="w-5 h-5" />
@@ -181,20 +181,20 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Card className="bg-white shadow-sm border-zinc-200 hidden sm:block">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-2 bg-orange-100 rounded-full">
-                  <ShoppingCart className="w-5 h-5 text-orange-600" />
+            <Card className="bg-white shadow-sm border-zinc-200 flex-1 sm:flex-none">
+              <CardContent className="p-3 md:p-4 flex items-center gap-3 md:gap-4">
+                <div className="p-2 bg-orange-100 rounded-full shrink-0">
+                  <ShoppingCart className="w-4 h-4 md:w-5 h-5 text-orange-600" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Reposición estimada</p>
-                  <p className="text-xl font-black text-zinc-900">
+                  <p className="text-[9px] md:text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Reposición estimada</p>
+                  <p className="text-lg md:text-xl font-black text-zinc-900">
                     {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(replenishmentCost)}
                   </p>
                 </div>
               </CardContent>
             </Card>
-            <Button variant="ghost" size="icon" onClick={signOut} className="text-zinc-400 hover:text-red-600 hover:bg-red-50">
+            <Button variant="ghost" size="icon" onClick={signOut} className="text-zinc-400 hover:text-red-600 shrink-0 hover:bg-red-50">
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
@@ -223,7 +223,7 @@ export default function App() {
                 <CardDescription>Controla tus existencias y precios del mercado</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <InventoryTable 
+                <InventoryTable
                   ingredients={ingredients}
                   onAdd={() => {
                     setEditingIngredient(null);
@@ -246,7 +246,7 @@ export default function App() {
                 <CardDescription>Gestiona tus preparaciones y calcula rentabilidad</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-                <RecipeList 
+                <RecipeList
                   recipes={recipes}
                   ingredients={ingredients}
                   onAdd={() => {
@@ -267,7 +267,7 @@ export default function App() {
           </TabsContent>
 
           <TabsContent value="settings">
-             <Card className="border-zinc-200 shadow-sm">
+            <Card className="border-zinc-200 shadow-sm">
               <CardHeader>
                 <CardTitle>Configuración</CardTitle>
                 <CardDescription>Ajustes de la aplicación y perfil</CardDescription>
@@ -284,14 +284,14 @@ export default function App() {
         </Tabs>
       </div>
 
-      <IngredientDialog 
+      <IngredientDialog
         open={isIngredientDialogOpen}
         onOpenChange={setIsIngredientDialogOpen}
         ingredient={editingIngredient}
         onSave={handleSaveIngredient}
       />
 
-      <RecipeDialog 
+      <RecipeDialog
         open={isRecipeDialogOpen}
         onOpenChange={setIsRecipeDialogOpen}
         recipe={editingRecipe}
@@ -299,7 +299,7 @@ export default function App() {
         onSave={handleSaveRecipe}
       />
 
-      <CookDialog 
+      <CookDialog
         open={isCookDialogOpen}
         onOpenChange={setIsCookDialogOpen}
         recipe={cookingRecipe}
