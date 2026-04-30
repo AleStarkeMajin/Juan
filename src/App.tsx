@@ -261,6 +261,7 @@ export default function App() {
                     setCookingRecipe(recipe);
                     setIsCookDialogOpen(true);
                   }}
+                  onDelete={handleDeleteRecipe}
                 />
               </CardContent>
             </Card>
