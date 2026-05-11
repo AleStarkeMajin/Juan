@@ -55,38 +55,19 @@ export function RecipeList({ recipes, ingredients, onCook, onAdd, onEdit, search
               <Card key={recipe.id} className="group hover:shadow-md transition-shadow border-zinc-200">
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
-                      <CardTitle className="text-xl font-bold">{recipe.name}</CardTitle>
-                      {recipe.description && (
-                        <p className="text-xs text-zinc-500 italic line-clamp-1">
-                          {recipe.description}
-                        </p>
-                      )}
-                    </div>
-                    <Badge variant="secondary" className="w-fit">
-                      Rinde: {recipe.yield} unidades
-                    </Badge>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onDelete(recipe.id)} className="text-zinc-400 hover:text-red-600 h-8 w-8">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                      <ChefHat className="w-5 h-5 text-zinc-400" />
-                    </div>
+                    <CardTitle className="text-xl font-bold">{recipe.name}</CardTitle>
+                    <ChefHat className="w-5 h-5 text-zinc-400 group-hover:text-zinc-900 transition-colors" />
                   </div>
+                  {recipe.description && (
+                    <p className="text-xs text-zinc-500 italic line-clamp-1">
+                      {recipe.description}
+                    </p>
+                  )}
+                  <Badge variant="secondary" className="w-fit">
+                    Rinde: {recipe.yield} unidades
+                  </Badge>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {recipe.description && (
-                    <div className="bg-zinc-50 p-3 rounded-lg border border-zinc-100 border-dashed">
-                      <div className="flex items-center gap-2 mb-1">
-                        <FileText className="w-3 h-3 text-zinc-400" />
-                        <span className="text-[10px] uppercase font-bold text-zinc-400">Preparación</span>
-                      </div>
-                      <p className="text-xs text-zinc-600 line-clamp-3 whitespace-pre-wrap">{recipe.description}</p>
-                    </div>
-                  )}
-
                   <div className="space-y-2">
                     <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Desglose de Costos</p>
                     <div className="grid grid-cols-2 gap-4">
@@ -121,10 +102,10 @@ export function RecipeList({ recipes, ingredients, onCook, onAdd, onEdit, search
                   </Button>
                 </CardFooter>
               </Card>
-      );
+            );
           })
         )}
+      </div>
     </div>
-    </div >
   );
 }

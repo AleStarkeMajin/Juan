@@ -7,7 +7,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Package, Utensils, ShoppingCart, Settings, LogOut, LogIn, ChefHat } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Search, X, Package, Utensils, ShoppingCart, Settings, LogOut, LogIn, ChefHat } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
@@ -35,6 +36,7 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('inventory');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -129,6 +131,18 @@ export default function App() {
     }
   };
 
+  const filteredIngredients = useMemo(() => {
+    if (!searchTerm) return ingredients;
+    const lowerSearch = searchTerm.toLowerCase();
+    return ingredients.filter(ing => ing.name.toLowerCase().includes(lowerSearch));
+  }, [ingredients, searchTerm]);
+
+  const filteredRecipes = useMemo(() => {
+    if (!searchTerm) return recipes;
+    const lowerSearch = searchTerm.toLowerCase();
+    return recipes.filter(recipe => recipe.name.toLowerCase().includes(lowerSearch));
+  }, [recipes, searchTerm]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50">
@@ -181,42 +195,66 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Card className="bg-white shadow-sm border-zinc-200 flex-1 sm:flex-none">
-              <CardContent className="p-3 md:p-4 flex items-center gap-3 md:gap-4">
-                <div className="p-2 bg-orange-100 rounded-full shrink-0">
-                  <ShoppingCart className="w-4 h-4 md:w-5 h-5 text-orange-600" />
+            <Card className="bg-white shadow-sm border-zinc-200 hidden sm:block">
+              <CardContent className="p-4 flex items-center gap-4">
+                <div className="p-2 bg-orange-100 rounded-full">
+                  <ShoppingCart className="w-5 h-5 text-orange-600" />
                 </div>
                 <div>
-                  <p className="text-[9px] md:text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Reposición estimada</p>
-                  <p className="text-lg md:text-xl font-black text-zinc-900">
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Reposición estimada</p>
+                  <p className="text-xl font-black text-zinc-900">
                     {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(replenishmentCost)}
                   </p>
                 </div>
               </CardContent>
             </Card>
-            <Button variant="ghost" size="icon" onClick={signOut} className="text-zinc-400 hover:text-red-600 shrink-0 hover:bg-red-50">
+            <Button variant="ghost" size="icon" onClick={signOut} className="text-zinc-400 hover:text-red-600 hover:bg-red-50">
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
         </header>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border border-zinc-200 p-1 h-auto self-start shadow-sm">
-            <TabsTrigger value="inventory" className="data-[state=active]:bg-zinc-900 data-[state=active]:text-white px-6 py-2.5 flex items-center gap-2 transition-all">
-              <Package className="w-4 h-4" />
-              Inventario
-            </TabsTrigger>
-            <TabsTrigger value="recipes" className="data-[state=active]:bg-zinc-900 data-[state=active]:text-white px-6 py-2.5 flex items-center gap-2 transition-all">
-              <Utensils className="w-4 h-4" />
-              Recetas
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="data-[state=active]:bg-zinc-900 data-[state=active]:text-white px-6 py-2.5 flex items-center gap-2 transition-all">
-              <Settings className="w-4 h-4" />
-              Configuración
-            </TabsTrigger>
-          </TabsList>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="bg-white border border-zinc-200 p-1 h-auto self-start shadow-sm">
+              <TabsTrigger value="inventory" className="data-[state=active]:bg-zinc-900 data-[state=active]:text-white px-6 py-2.5 flex items-center gap-2 transition-all">
+                <Package className="w-4 h-4" />
+                Inventario
+              </TabsTrigger>
+              <TabsTrigger value="recipes" className="data-[state=active]:bg-zinc-900 data-[state=active]:text-white px-6 py-2.5 flex items-center gap-2 transition-all">
+                <Utensils className="w-4 h-4" />
+                Recetas
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="data-[state=active]:bg-zinc-900 data-[state=active]:text-white px-6 py-2.5 flex items-center gap-2 transition-all">
+                <Settings className="w-4 h-4" />
+                Configuración
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-          <TabsContent value="inventory" className="space-y-4 outline-none">
+          <div className="relative w-full md:max-w-xs group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-zinc-900 transition-colors" />
+            <Input
+              placeholder={`Buscar en ${activeTab === 'inventory' ? 'ingredientes' : activeTab === 'recipes' ? 'recetas' : 'configuración'}...`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-10 bg-white border-zinc-200 focus-visible:ring-zinc-900 focus-visible:ring-offset-0 shadow-sm rounded-lg transition-all"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-zinc-100 rounded-full transition-colors text-zinc-400 hover:text-zinc-900"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+
+
+        <Tabs value={activeTab} className="space-y-6">
+          <TabsContent value="inventory" className="space-y-4 outline-none border-none p-0 m-0">
             <Card className="border-zinc-200 shadow-sm overflow-hidden">
               <CardHeader className="bg-white border-b border-zinc-100">
                 <CardTitle className="text-2xl font-bold">Ingredientes</CardTitle>
@@ -224,7 +262,7 @@ export default function App() {
               </CardHeader>
               <CardContent className="p-6">
                 <InventoryTable
-                  ingredients={ingredients}
+                  ingredients={filteredIngredients}
                   onAdd={() => {
                     setEditingIngredient(null);
                     setIsIngredientDialogOpen(true);
@@ -234,12 +272,13 @@ export default function App() {
                     setIsIngredientDialogOpen(true);
                   }}
                   onDelete={handleDeleteIngredient}
+                  searchTerm={searchTerm}
                 />
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="recipes" className="space-y-4 outline-none">
+          <TabsContent value="recipes" className="space-y-4 outline-none border-none p-0 m-0">
             <Card className="border-zinc-200 shadow-sm overflow-hidden">
               <CardHeader className="bg-white border-b border-zinc-100">
                 <CardTitle className="text-2xl font-bold">Recetario</CardTitle>
@@ -247,7 +286,7 @@ export default function App() {
               </CardHeader>
               <CardContent className="p-6">
                 <RecipeList
-                  recipes={recipes}
+                  recipes={filteredRecipes}
                   ingredients={ingredients}
                   onAdd={() => {
                     setEditingRecipe(null);
@@ -261,7 +300,7 @@ export default function App() {
                     setCookingRecipe(recipe);
                     setIsCookDialogOpen(true);
                   }}
-                  onDelete={handleDeleteRecipe}
+                  searchTerm={searchTerm}
                 />
               </CardContent>
             </Card>

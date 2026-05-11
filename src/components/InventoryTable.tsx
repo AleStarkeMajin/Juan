@@ -15,9 +15,10 @@ interface InventoryTableProps {
   onEdit: (ingredient: Ingredient) => void;
   onDelete: (id: string) => void;
   onAdd: () => void;
+  searchTerm?: string;
 }
 
-export function InventoryTable({ ingredients, onEdit, onDelete, onAdd }: InventoryTableProps) {
+export function InventoryTable({ ingredients, onEdit, onDelete, onAdd, searchTerm }: InventoryTableProps) {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -33,7 +34,7 @@ export function InventoryTable({ ingredients, onEdit, onDelete, onAdd }: Invento
             <TableRow>
               <TableHead className="font-semibold">Ingrediente</TableHead>
               <TableHead className="font-semibold">Cantidad Actual</TableHead>
-              <TableHead className="font-semibold hidden md:table-cell">Umbral</TableHead>
+              <TableHead className="font-semibold">Umbral</TableHead>
               <TableHead className="font-semibold">Precio / Paquete</TableHead>
               <TableHead className="font-semibold text-right">Acciones</TableHead>
             </TableRow>
@@ -41,8 +42,11 @@ export function InventoryTable({ ingredients, onEdit, onDelete, onAdd }: Invento
           <TableBody>
             {ingredients.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-zinc-500">
-                  No hay ingredientes registrados.
+                <TableCell colSpan={5} className="text-center py-12 text-zinc-500">
+                  {searchTerm
+                    ? `No se encontraron ingredientes que coincidan con "${searchTerm}"`
+                    : "No hay ingredientes registrados."
+                  }
                 </TableCell>
               </TableRow>
             ) : (
@@ -50,20 +54,19 @@ export function InventoryTable({ ingredients, onEdit, onDelete, onAdd }: Invento
                 const isLow = ingredient.currentQuantity < ingredient.threshold;
                 return (
                   <TableRow key={ingredient.id} className="hover:bg-zinc-50/50">
-                    <TableCell className="py-3 px-2 md:p-4 font-medium">
-                      <div className="flex flex-col gap-1">
-                        <span className="truncate max-w-[120px] md:max-w-none">{ingredient.name}</span>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {ingredient.name}
                         {isLow && (
-                          <Badge variant="destructive" className="w-fit text-[9px] py-0 px-1 bg-red-100 text-red-700 border-red-200">
+                          <Badge variant="destructive" className="bg-red-100 text-red-700 border-red-200 hover:bg-red-100">
                             <AlertTriangle className="w-3 h-3 mr-1" />
                             Bajo Stock
                           </Badge>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="text-center">
-                      <span className={isLow ? 'text-red-600 font-bold' : 'text-zinc-700'}>                        {ingredient.currentQuantity} <span className="text-[10px] opacity-70">{ingredient.unit}</span>
-
+                    <TableCell>
+                      <span className={isLow ? 'text-red-600 font-bold' : 'text-zinc-700'}>                        {ingredient.currentQuantity} {ingredient.unit}
                       </span>
                     </TableCell>
                     <TableCell className="text-zinc-500 hidden md:table-cell">
