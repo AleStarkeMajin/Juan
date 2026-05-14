@@ -195,20 +195,20 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Card className="bg-white shadow-sm border-zinc-200 hidden sm:block">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-2 bg-orange-100 rounded-full">
-                  <ShoppingCart className="w-5 h-5 text-orange-600" />
+            <Card className="bg-white shadow-sm border-zinc-200">
+              <CardContent className="p-3 md:p-4 flex items-center gap-3 md:gap-4">
+                <div className="p-2 bg-orange-100 rounded-full shrink-0">
+                  <ShoppingCart className="w-4 h-4 md:w-5 md:h-5 text-orange-600" />
                 </div>
-                <div>
-                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Reposición estimada</p>
-                  <p className="text-xl font-black text-zinc-900">
+                <div className="min-w-0">
+                  <p className="text-[9px] md:text-[10px] font-bold text-zinc-500 uppercase tracking-widest truncate">Reposición estimada</p>
+                  <p className="text-lg md:text-xl font-black text-zinc-900">
                     {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(replenishmentCost)}
                   </p>
                 </div>
               </CardContent>
             </Card>
-            <Button variant="ghost" size="icon" onClick={signOut} className="text-zinc-400 hover:text-red-600 hover:bg-red-50">
+            <Button variant="ghost" size="icon" onClick={signOut} className="text-zinc-400 hover:text-red-600 hover:bg-red-50 shrink-0">
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
