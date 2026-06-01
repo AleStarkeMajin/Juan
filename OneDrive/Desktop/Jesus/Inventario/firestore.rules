@@ -41,7 +41,7 @@ service cloud.firestore {
     // Rules
     match /ingredients/{ingredientId} {
       allow get: if isDocOwner();
-      allow list: if isAuthenticated() && request.query.where('userId', '==', request.auth.uid);
+      allow list: if isAuthenticated();
       allow create: if isAuthenticated() && isValidIngredient(request.resource.data);
       allow update: if isDocOwner() && isValidIngredient(request.resource.data) && userIdNotModified();
       allow delete: if isDocOwner();
@@ -49,7 +49,7 @@ service cloud.firestore {
 
     match /recipes/{recipeId} {
       allow get: if isDocOwner();
-      allow list: if isAuthenticated() && request.query.where('userId', '==', request.auth.uid);
+      allow list: if isAuthenticated();
       allow create: if isAuthenticated() && isValidRecipe(request.resource.data);
       allow update: if isDocOwner() && isValidRecipe(request.resource.data) && userIdNotModified();
       allow delete: if isDocOwner();
@@ -57,7 +57,7 @@ service cloud.firestore {
 
     match /logs/{logId} {
       allow get: if isDocOwner();
-      allow list: if isAuthenticated() && request.query.where('userId', '==', request.auth.uid);
+      allow list: if isAuthenticated();
       allow create: if isAuthenticated() && isValidLog(request.resource.data);
       allow update: if false; // Logs are immutable
       allow delete: if isDocOwner();

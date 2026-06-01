@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "juan-8f810"
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

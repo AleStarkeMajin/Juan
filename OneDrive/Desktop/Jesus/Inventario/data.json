@@ -1,0 +1,38 @@
+{
+  "ingredients": [
+    {
+      "id": "test1",
+      "name": "Prueba",
+      "currentQuantity": 10,
+      "unit": "kg",
+      "price": 5,
+      "purchaseUnit": "kg",
+      "purchaseQuantity": 1,
+      "threshold": 2
+    },
+    {
+      "name": "UI Test Ingredient",
+      "currentQuantity": 3,
+      "unit": "kg",
+      "price": 4.5,
+      "purchaseUnit": "kg",
+      "purchaseQuantity": 1,
+      "threshold": 1,
+      "id": "bozlj6hln",
+      "userId": "local-user"
+    },
+    {
+      "name": "Harina",
+      "currentQuantity": 0,
+      "unit": "kg",
+      "price": 0,
+      "purchaseUnit": "kg",
+      "purchaseQuantity": 1,
+      "threshold": 0,
+      "id": "idy86yll0",
+      "userId": "local-user"
+    }
+  ],
+  "recipes": [],
+  "logs": []
+}
