@@ -11,8 +11,8 @@ import { Package, Utensils, ShoppingCart, Settings, LogOut, LogIn, ChefHat } fro
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
-// import { auth, signIn, signOut } from './lib/firebase';
-// import { onAuthStateChanged, User } from 'firebase/auth';
+import { auth, signIn, signOut } from './lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import { 
   subscribeToIngredients, 
   subscribeToRecipes, 
@@ -32,12 +32,8 @@ import { CookDialog } from './components/CookDialog';
 import { calculateIngredientCost } from './lib/calculations';
 
 export default function App() {
-  const [user, setUser] = useState<{ displayName: string; email: string; uid: string } | null>({
-    displayName: 'Usuario Local',
-    email: 'local@example.com',
-    uid: 'local-user'
-  });
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<{ displayName: string | null; email: string | null; uid: string } | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('inventory');
   
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
@@ -53,15 +49,25 @@ export default function App() {
   const [isCookDialogOpen, setIsCookDialogOpen] = useState(false);
   const [cookingRecipe, setCookingRecipe] = useState<Recipe | null>(null);
 
-  /*
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser({
+          displayName: firebaseUser.displayName || 'Usuario',
+          email: firebaseUser.email || '',
+          uid: firebaseUser.uid
+        });
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
-  */
 
   useEffect(() => {
     if (user) {
@@ -146,6 +152,40 @@ export default function App() {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50/50 p-4 font-sans">
+        <Card className="w-full max-w-md border-zinc-200 shadow-xl overflow-hidden bg-white">
+          <CardHeader className="text-center pt-8 pb-4">
+            <div className="mx-auto w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center shadow-lg mb-4">
+              <ChefHat className="w-9 h-9 text-white" />
+            </div>
+            <CardTitle className="text-3xl font-black text-zinc-900 tracking-tight">Sabor & Stock</CardTitle>
+            <CardDescription className="text-zinc-500 text-sm mt-1">
+              Gestión inteligente de inventario y recetas para cocinas
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-8 pb-8 space-y-6">
+            <div className="space-y-4">
+              <Button 
+                onClick={signIn} 
+                className="w-full bg-zinc-900 text-white hover:bg-zinc-800 h-12 flex items-center justify-center gap-3 rounded-lg font-medium transition-all shadow-md cursor-pointer"
+              >
+                <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24">
+                  <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.435 0-6.223-2.77-6.223-6.185 0-3.414 2.788-6.185 6.223-6.185 1.506 0 2.88.535 3.972 1.407l3.13-3.13C19.203 1.9 15.97 1 12.24 1 5.922 1 1 5.93 1 12s4.922 11 11.24 11c6.514 0 11.24-4.514 11.24-11 0-.742-.08-1.428-.24-2.09l-11 2.175z" />
+                </svg>
+                Iniciar sesión con Google
+              </Button>
+            </div>
+            <p className="text-center text-xs text-zinc-400">
+              Accede de forma segura para guardar tus datos
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-zinc-50/50 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -173,11 +213,9 @@ export default function App() {
                 </div>
               </CardContent>
             </Card>
-            {/* 
-            <Button variant="ghost" size="icon" onClick={signOut} className="text-zinc-400 hover:text-red-600 shrink-0 hover:bg-red-50">
+            <Button variant="ghost" size="icon" onClick={signOut} className="text-zinc-400 hover:text-red-600 shrink-0 hover:bg-red-50 h-10 w-10 rounded-lg" title="Cerrar sesión">
               <LogOut className="w-5 h-5" />
             </Button>
-            */}
           </div>
         </header>
 
@@ -254,9 +292,19 @@ export default function App() {
                 <CardDescription>Ajustes de la aplicación y perfil</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 bg-zinc-50 rounded-lg border border-zinc-100">
-                  <p className="font-medium text-zinc-900">Usuario: {user.displayName}</p>
-                  <p className="text-sm text-zinc-500">{user.email}</p>
+                <div className="p-4 bg-zinc-50 rounded-lg border border-zinc-100 flex items-center justify-between flex-wrap gap-4">
+                  <div>
+                    <p className="font-medium text-zinc-900">Usuario: {user.displayName}</p>
+                    <p className="text-sm text-zinc-500">{user.email}</p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    onClick={signOut} 
+                    className="border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-medium cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Cerrar Sesión
+                  </Button>
                 </div>
                 <p className="text-zinc-400 text-sm italic">Más opciones de personalización próximamente...</p>
               </CardContent>
