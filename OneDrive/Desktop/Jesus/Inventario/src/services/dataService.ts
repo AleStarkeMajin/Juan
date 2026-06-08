@@ -190,15 +190,21 @@ export const cookRecipe = async (
   const ratio = unitsProduced / recipe.yield;
   try {
     await runTransaction(db, async (tx) => {
-      // Update ingredients quantities
+      // Phase 1: Read ALL ingredient snapshots first
+      const ingredientReads: { ref: any; snap: any; recipeIng: any }[] = [];
       for (const recipeIng of recipe.ingredients) {
         const ingRef = doc(db, "ingredients", recipeIng.ingredientId);
         const ingSnap = await tx.get(ingRef);
-        if (!ingSnap.exists()) continue;
-        const ingData = ingSnap.data() as any;
+        ingredientReads.push({ ref: ingRef, snap: ingSnap, recipeIng });
+      }
+
+      // Phase 2: Perform ALL writes after reads are done
+      for (const { ref, snap, recipeIng } of ingredientReads) {
+        if (!snap.exists()) continue;
+        const ingData = snap.data() as any;
         const newQty =
           (ingData.currentQuantity || 0) - recipeIng.amount * ratio;
-        tx.update(ingRef, {
+        tx.update(ref, {
           currentQuantity: newQty,
           updatedAt: serverTimestamp(),
         });
